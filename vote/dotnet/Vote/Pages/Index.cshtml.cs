@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Vote.Messaging;
 using Vote.Messaging.Messages;
+using Vote.Workers;
 
 namespace Vote.Pages
 {
@@ -16,12 +17,14 @@ namespace Vote.Pages
         protected readonly IMessageQueue _messageQueue;
         protected readonly IConfiguration _configuration;
         protected readonly ILogger _logger;
+        protected readonly IQueueWorker _queueWorker;
 
-        public IndexModel(IMessageQueue messageQueue, IConfiguration configuration, ILogger<IndexModel> logger)
+        public IndexModel(IMessageQueue messageQueue, IConfiguration configuration, ILogger<IndexModel> logger, IQueueWorker queueWorker)
         {
             _messageQueue = messageQueue;
             _configuration = configuration;
             _logger = logger;
+            _queueWorker = queueWorker;
 
             _optionA = _configuration.GetValue<string>("Voting:OptionA");
             _optionB = _configuration.GetValue<string>("Voting:OptionB");
@@ -30,6 +33,9 @@ namespace Vote.Pages
         public string OptionA { get; private set; }
 
         public string OptionB { get; private set; }
+
+        public string NextLink { get; private set; } = "unset";
+        public string NextDescription { get; private set; } = "desc";
 
         [BindProperty]
         public string Vote { get; private set; }
@@ -44,6 +50,8 @@ namespace Vote.Pages
         {
             OptionA = _optionA;
             OptionB = _optionB;
+            NextLink = _queueWorker.Url;
+            NextDescription = _queueWorker.Description;
         }
 
         public IActionResult OnPost(string vote)
@@ -55,6 +63,8 @@ namespace Vote.Pages
             {
                 PublishVote(vote);
             }
+            NextLink = _queueWorker.Url;
+            NextDescription = _queueWorker.Description;
             return Page();
         }
 

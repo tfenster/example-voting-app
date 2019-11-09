@@ -1,9 +1,12 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Vote.Messaging;
+using Vote.Workers;
 
 namespace Vote
 {
@@ -24,7 +27,14 @@ namespace Vote
                 {
                     options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
                 });
-            services.AddTransient<IMessageQueue, MessageQueue>();
+            
+            var loggerFactory = new LoggerFactory()
+                .AddConsole();
+
+            services.AddTransient<IMessageQueue, MessageQueue>()
+                .AddSingleton(loggerFactory)
+                .AddLogging()
+                .AddSingleton<IQueueWorker, QueueWorker>();
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -40,6 +50,12 @@ namespace Vote
                                  
             app.UseStaticFiles();
             app.UseMvc();
+
+            var worker = app.ApplicationServices.GetService<IQueueWorker>();
+            Task.Run(() =>
+            {
+                worker.Start();
+            });
         }
     }
 }

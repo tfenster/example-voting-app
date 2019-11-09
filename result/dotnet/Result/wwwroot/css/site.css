@@ -69,7 +69,6 @@ body {
 	vertical-align: middle;
 	font-size: 40px;
 	font-weight: 600;
-	width: 450px;
 	height: 200px;
 }
 
@@ -89,6 +88,7 @@ body {
 		transform: translateY(-50%);
 		text-align: left;
 		padding-left: 50px;
+		padding-right: 50px;
 	}
 
 		#choice .choice .label {

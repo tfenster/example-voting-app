@@ -1,0 +1,52 @@
+version: "3.2"
+
+services:
+  vote:
+    image: dockersamples/examplevotingapp_vote:dotnet-nanoserver-1903
+    build: 
+      context: ./vote/dotnet
+      dockerfile: Dockerfile.1903
+    ports:
+      - "80"
+    depends_on:
+      - message-queue
+
+  result:
+    image: dockersamples/examplevotingapp_result:dotnet-nanoserver-1903
+    build: 
+      context: ./result/dotnet
+      dockerfile: Dockerfile.1903
+    ports:
+      - "5001:80"
+    environment:      
+      - "ConnectionStrings:ResultData=Server=db;Database=votes;User Id=sa;Password=5uperSecret!"
+    depends_on:
+      - db
+
+  worker:
+    image: dockersamples/examplevotingapp_worker:dotnet-nanoserver-1903
+    build:
+      context: ./worker/dotnet
+      dockerfile: Dockerfile.1903
+    environment:      
+      - "ConnectionStrings:VoteData=Server=db;Database=votes;User Id=sa;Password=5uperSecret!"
+    depends_on:
+      - message-queue
+      - db
+
+  message-queue:
+    image: nats:2.1-nanoserver-1809
+
+  db:
+    image: private-repo.microsoft.com/mssql-private-preview/mssql-server:windows-2019-rtm
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "MSSQL_SA_PASSWORD=5uperSecret!"
+      - "MSSQL_PID=Developer"
+    ports:
+      - "1433:1433"
+
+networks:
+  default:
+    external:
+      name: nat

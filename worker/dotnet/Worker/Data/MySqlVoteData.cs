@@ -17,18 +17,22 @@ namespace Worker.Data
         public void Set(string voterId, string vote)
         {
             var currentVote = _context.Votes.Find(voterId);
-            if (currentVote == null)
+            if (currentVote != null)
             {
-                _context.Votes.Add(new Vote
-                {
-                    VoterId = voterId,
-                    VoteOption = vote
-                });
+                _context.Votes.Remove(currentVote);
+                _context.SaveChanges();
             }
-            else if (currentVote.VoteOption != vote)
+            
+            _context.Votes.Add(new Vote
             {
-                currentVote.VoteOption = vote;
-            }
+                VoterId = voterId,
+                VoteOption = vote
+            });
+            _context.SaveChanges();
+        }
+
+        public void Reset() {
+            _context.Votes.RemoveRange(_context.Votes);
             _context.SaveChanges();
         }
     }

@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using System.Data.SqlClient;
+using System.Linq;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
 using Result.Models;
 
 namespace Result.Data
@@ -21,7 +21,7 @@ namespace Result.Data
         public ResultsModel GetResults()
         {
             var model = new ResultsModel();            
-            using (var connection = new MySqlConnection(_connectionString))
+            using (var connection = new SqlConnection(_connectionString))
             {                
                 var results = connection.Query("SELECT vote, COUNT(id) AS count FROM votes GROUP BY vote ORDER BY vote");
                 if (results.Any(x => x.vote == "a"))

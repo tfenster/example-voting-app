@@ -1,0 +1,22 @@
+@page
+@model Vote.Pages.SetupModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>LinkSetup</title>
+</head>
+<body>
+    <form method="post">
+        <input asp-for="LinkUrl" />
+        <input asp-for="Description" />
+        <button>Update</button>
+    </form>
+</body>
+</html>

@@ -10,6 +10,6 @@ namespace Worker.Messaging.Messages
 
         public string Vote {get; set; }
 
-         public static string MessageSubject = "events.vote.votecast";
+        public static string MessageSubject = "events.vote.votecast";
     }
 }
