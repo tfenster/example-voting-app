@@ -7,7 +7,7 @@ services:
       context: ./vote/dotnet
       dockerfile: Dockerfile.1809
     ports:
-      - "5000:80"
+      - "80"
     depends_on:
       - message-queue
 
@@ -19,7 +19,7 @@ services:
     ports:
       - "5001:80"
     environment:      
-      - "ConnectionStrings:ResultData=Server=db;Port=4000;Database=votes;User=root;SslMode=None"
+      - "ConnectionStrings:ResultData=Server=db;Database=votes;User Id=sa;Password=5uperSecret!"
     depends_on:
       - db
 
@@ -29,18 +29,22 @@ services:
       context: ./worker/dotnet
       dockerfile: Dockerfile.1809
     environment:      
-      - "ConnectionStrings:VoteData=Server=db;Port=4000;Database=votes;User=root;SslMode=None"
+      - "ConnectionStrings:VoteData=Server=db;Database=votes;User Id=sa;Password=5uperSecret!"
     depends_on:
       - message-queue
       - db
 
   message-queue:
-    image: dockersamples/nats:nanoserver-1809
+    image: nats:2.1-nanoserver-1809
 
   db:
-    image: dockersamples/tidb:nanoserver-1809
+    image: private-repo.microsoft.com/mssql-private-preview/mssql-server:windows-2019-rtm
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "MSSQL_SA_PASSWORD=5uperSecret!"
+      - "MSSQL_PID=Developer"
     ports:
-      - "3306:4000"
+      - "1433:1433"
 
 networks:
   default:
