@@ -7,7 +7,7 @@ services:
       context: ./vote/dotnet
       dockerfile: Dockerfile.1903
     ports:
-      - "80"
+      - "80:80"
     depends_on:
       - message-queue
 
